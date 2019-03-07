@@ -14,6 +14,21 @@ function map(data){
 	
 	var svgLayer = L.svg();
 	svgLayer.addTo(mymap);
+
+	//Adding a info box that displays info when you hover over
+	var info = L.control();
+
+	info.onAdd = function(map){
+		this._div = L.DomUtil.create('div', 'info');
+		this.update();
+		return this._div;
+	};
+
+	info.update = function(props){
+		this._div.innerHTML = '<h4>Någon kul data</h4>' + (props ? '<b>' + props.name + '<b> <br />' + props.density + 'st' : 'Hovra över ett län');
+	};
+
+	info.addTo(mymap);
 	
 	
 	
@@ -50,6 +65,7 @@ function map(data){
 		
 	});
 	
+	//Styling of the layover
 	function style(){
 		return{
 			fillColor: '',
@@ -60,7 +76,11 @@ function map(data){
 		};
 		
 	}
+	properties:({
 
+	})
+
+	//Styling of the layover when you highlight it
 	function highlightFeature(e){
 		var layer = e.target;
 
@@ -74,16 +94,21 @@ function map(data){
 		if(!L.Browser.ie && !L.Browser.opera && !L.Browser.edge){
 			layer.bringToFront();
 		}
+
+		info.update({name: 'lol', density: 100});
 	}
 
+	//Reset of the layover when you dehighlight it
 	function resetHighlight(e){
 		geojson.resetStyle(e.target);
+		info.update();
 	}
 
 	function zoomToFeature(e) {
     	mymap.fitBounds(e.target.getBounds());
 	}
 
+	//all the features
 	function onEachFeature(feature, layer) {
    		layer.on({
         	mouseover: highlightFeature,
@@ -92,9 +117,11 @@ function map(data){
     	});
 	}	
 
+	//Map the layover
 	geojson = L.geoJson(data, 
 			{style: style,
 			onEachFeature: onEachFeature}).addTo(mymap);
+
 }
 
 
