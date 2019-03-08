@@ -1,0 +1,21 @@
+rect {
+  fill: none;
+  pointer-events: all;
+}
+
+.feature {
+  fill: #ccc;
+  opacity: .5;
+  cursor: pointer;
+}
+
+.feature.active {
+  fill: orange;
+}
+
+.mesh {
+  fill: none;
+  stroke: black;
+  stroke-width: .3px;
+  stroke-linejoin: bevel;
+}

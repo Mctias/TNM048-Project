@@ -3,12 +3,13 @@ function map(data){
 
 	var geojson;
 
-	//var geoJsonData = new L.GeoJSON.AJAX("../sweden_counties.geojson");   
+	//var geoJsonData = new L.GeoJSON.AJAX("../sweden_counties.geojson");  
 	
 	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
 	    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
 	    maxZoom: 18,
-	    id: 'mapbox.streets',
+	    id: 'mapbox.light',
+	    noWrap: true,
 	    accessToken: 'pk.eyJ1IjoibWN0aWFzIiwiYSI6ImNqc2V2ZDB4ajE2dTc0M282azR0eTVocW8ifQ.IQP4GS8uS3dB3J5i1PGKZA'
 	}).addTo(mymap);
 	
@@ -25,7 +26,7 @@ function map(data){
 	};
 
 	info.update = function(props){
-		this._div.innerHTML = '<h4>Någon kul data</h4>' + (props ? '<b>' + props.name + '<b> <br />' + props.density + 'st' : 'Hovra över ett län');
+		this._div.innerHTML = '<h4>Data</h4>' + (props ? '<b>' + props.name: 'Hovra över ett län');
 	};
 
 	info.addTo(mymap);
@@ -76,9 +77,7 @@ function map(data){
 		};
 		
 	}
-	properties:({
 
-	})
 
 	//Styling of the layover when you highlight it
 	function highlightFeature(e){
@@ -94,8 +93,8 @@ function map(data){
 		if(!L.Browser.ie && !L.Browser.opera && !L.Browser.edge){
 			layer.bringToFront();
 		}
-
-		info.update({name: 'lol', density: 100});
+		console.log(layer.feature.properties);
+		info.update(layer.feature.properties);
 	}
 
 	//Reset of the layover when you dehighlight it
