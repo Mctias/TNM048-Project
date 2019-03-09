@@ -1,4 +1,4 @@
-function map(data){
+function map(sweden_counties, cities_geom, cities_inhabitants){
 	var mymap = L.map('mapid').setView([62, 15], 5);
 
 	//var geojson;
