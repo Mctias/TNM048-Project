@@ -1,4 +1,66 @@
 function map(sweden_counties, cities_geom, cities_inhabitants){
+	this.year = 1570;
+	this.svglayer = null;
+	
+	this.update = function(year) {
+		this.year = year;
+		let inhab = cities_inhabitants[year];
+		let inhab_next = cities_inhabitants[year+10];
+		
+		mymap.removeLayer(this.svglayer);
+		this.svglayer = null;
+		
+		this.svglayer = L.svg({clickable:true}).addTo(mymap);	
+		
+		var svg = d3.select("#mapid").select("svg").attr("pointer-events", "auto");
+		var g = svg.append("g");
+		
+		// Add a LatLng object to each item in the dataset 
+		cities_geom.features.forEach(function(d) {
+			d.latLng = new L.LatLng(d.geometry.coordinates[0],
+									d.geometry.coordinates[1]);
+		});
+
+		var feature = g.selectAll("circle")
+			.data(cities_geom.features)
+			.enter().append("circle")
+			.attr("class", "mapcircle")
+			.style("stroke", "black")
+			.style("opacity", function(d){
+				let opacity = 0.2;
+				if (inhab[d.properties.city] == 0 || inhab_next[d.properties.city] == 0) {
+					return 0.5;
+				}
+				let increase = Math.max(0.1, (inhab_next[d.properties.city] - inhab[d.properties.city])/inhab[d.properties.city]);
+				if (isNaN(increase)) {
+					return 0.5;
+				}
+				console.log(opacity+increase);
+				return opacity+2*increase;
+			})
+			.style("fill", function(d){
+				return "red";
+			})
+			.attr("r", function(d){
+				let size = Math.floor(Math.pow(inhab[d.properties.city], 0.25));
+				if (isNaN(size)) {
+					return 0;
+				}
+				return size;
+			});
+			
+			mouseOver(feature);
+			mouseOut(feature);
+		
+		
+		feature.attr("transform",
+		    	function(d) {
+		   			var layerPoint = mymap.latLngToLayerPoint(d.latLng);
+		     		return "translate("+ layerPoint.x +","+ layerPoint.y +")";
+		        }
+		    )
+	}
+	
 	var mymap = L.map('mapid').setView([62, 15], 5);
 
 	//var geojson;
@@ -14,7 +76,7 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 	}).addTo(mymap);
 
 	
-	L.svg({clickable:true}).addTo(mymap);	
+	this.svglayer = L.svg({clickable:true}).addTo(mymap);	
 
 	//Adding a info box that displays info when you hover over
 	/*var info = L.control();
@@ -30,46 +92,11 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 	};
 
 	info.addTo(mymap);*/
-	
-	
-	
-	
-	var svg = d3.select("#mapid").select("svg").attr("pointer-events", "auto");
-	var g = svg.append("g");
-	
-	d3.json("cities_geom.geojson", function(collection) {
-		// Add a LatLng object to each item in the dataset 
-		collection.features.forEach(function(d) {
-			d.latLng = new L.LatLng(d.geometry.coordinates[0],
-									d.geometry.coordinates[1]);
-		});
-	
-		var feature = g.selectAll("circle")
-			.data(collection.features)
-			.enter().append("circle")
-			.attr("class", "mapcircle")
-			.style("stroke", "black")
-			.style("opacity", .6)
-			.style("fill", "red")
-			.attr("r", 6);
-			
-			mouseOver(feature);
-			mouseOut(feature);
-			
-		function update() {
-		    feature.attr("transform",
-		    	function(d) {
-		   			var layerPoint = mymap.latLngToLayerPoint(d.latLng);
-		     		return "translate("+ layerPoint.x +","+ layerPoint.y +")";
-		        }
-		    )
-		}
-		
 
-		update();
-		mymap.on("moveend", update);
+	this.update(this.year);
+	mymap.on("moveend", this.update(this.year));
 		
-	});
+	
 
 	function mouseOver(feature){
 		 feature.on("mouseover", function(){
