@@ -3,24 +3,64 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 	this.svglayer = null;
 	
 	this.update = function(year) {
+		update(year);
+	}
+	
+	var update = function(year) {
 		this.year = year;
 		let inhab = cities_inhabitants[year];
 		let inhab_next = cities_inhabitants[year+10];
 		
-		mymap.removeLayer(this.svglayer);
+		if (mymap.hasLayer(this.svglayer)) {
+			mymap.removeLayer(this.svglayer);
+		}
 		this.svglayer = null;
-		
-		this.svglayer = L.svg({clickable:true}).addTo(mymap);	
+		this.svglayer = L.svg({clickable:true}).addTo(mymap);
 		
 		var svg = d3.select("#mapid").select("svg").attr("pointer-events", "auto");
 		var g = svg.append("g");
+		
+		let mean_x = 0;
+		let mean_y = 0;
+		let count_cities = 0;
+		let count_inhab = 0;
 		
 		// Add a LatLng object to each item in the dataset 
 		cities_geom.features.forEach(function(d) {
 			d.latLng = new L.LatLng(d.geometry.coordinates[0],
 									d.geometry.coordinates[1]);
+			
+			if (!isNaN(d.geometry.coordinates[0]*parseInt(inhab[d.properties.city])) && !isNaN(d.geometry.coordinates[1]*parseInt(inhab[d.properties.city]))){
+				count_cities++;
+				count_inhab++;
+				mean_x += d.geometry.coordinates[0]//*parseInt(inhab[d.properties.city]);
+				mean_y += d.geometry.coordinates[1]//*parseInt(inhab[d.properties.city]);
+			}
 		});
+		
+		mean_x = mean_x/(count_cities)//*count_inhab);
+		mean_y = mean_y/(count_cities)//*count_inhab);
+		
+		console.log(count_cities, mean_x, mean_y);
 
+		let centerpoint = new L.LatLng(59.32,18.06);
+		
+		var c = svg.append("g")
+			.data(centerpoint)
+			.enter().append("circle")
+			.attr("class", "mapcircle")
+			.style("stroke", "black")
+			.style("opacity", 0.5)
+			.style("fill", "blue")
+			.attr("r", 100)
+			.attr("transform",
+		    	function(d) {
+		   			var layerPoint = mymap.latLngToLayerPoint(d);
+		     		return "translate("+ layerPoint.x +","+ layerPoint.y +")";
+		        }
+		    );
+		
+		
 		var feature = g.selectAll("circle")
 			.data(cities_geom.features)
 			.enter().append("circle")
@@ -35,7 +75,6 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 				if (isNaN(increase)) {
 					return 0.5;
 				}
-				console.log(opacity+increase);
 				return opacity+2*increase;
 			})
 			.style("fill", function(d){
@@ -47,7 +86,7 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 					return 0;
 				}
 				return size;
-			});
+			});			
 			
 			mouseOver(feature);
 			mouseOut(feature);
@@ -76,7 +115,7 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 	}).addTo(mymap);
 
 	
-	this.svglayer = L.svg({clickable:true}).addTo(mymap);	
+	//this.svglayer = L.svg({clickable:true}).addTo(mymap);	
 
 	//Adding a info box that displays info when you hover over
 	/*var info = L.control();
@@ -93,10 +132,9 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 
 	info.addTo(mymap);*/
 
-	this.update(this.year);
-	mymap.on("moveend", this.update(this.year));
-		
-	
+	update(this.year);
+	mymap.on("moveend", update(this.year));
+	mymap.on("zoomend", update(this.year));
 
 	function mouseOver(feature){
 		 feature.on("mouseover", function(){
