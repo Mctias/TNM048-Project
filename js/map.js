@@ -7,7 +7,9 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 		let inhab = cities_inhabitants[year];
 		let inhab_next = cities_inhabitants[year+10];
 
-		mymap.removeLayer(this.svglayer);
+		if (mymap.hasLayer(this.svglayer)){
+			mymap.removeLayer(this.svglayer);
+		}
 		this.svglayer = null;
 		
 		this.svglayer = L.svg({clickable:true}).addTo(mymap);	
@@ -15,11 +17,28 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 		var svg = d3.select("#mapid").select("svg").attr("pointer-events", "auto");
 		var g = svg.append("g");
 		
+		let mean_x = 0;
+		let mean_y = 0;
+		let count_cities = 0;
+		let count_inhab = 0;
+		
 		// Add a LatLng object to each item in the dataset 
 		cities_geom.features.forEach(function(d) {
-			d.latLng = new L.LatLng(d.geometry.coordinates[0],
-									d.geometry.coordinates[1]);
+			d.latLng = new L.LatLng(Math.round(d.geometry.coordinates[1]*100)/100,
+									Math.round(d.geometry.coordinates[0]*100)/100);
+			
+			if (!isNaN(d.geometry.coordinates[0]*parseInt(inhab[d.properties.city])) && !isNaN(d.geometry.coordinates[1]*parseInt(inhab[d.properties.city]))){
+				count_cities++;
+				count_inhab+=parseInt(inhab[d.properties.city]);
+				mean_x += d.geometry.coordinates[0]*parseInt(inhab[d.properties.city]);
+				mean_y += d.geometry.coordinates[1]*parseInt(inhab[d.properties.city]);
+			}
 		});
+		
+		mean_x = mean_x/(count_inhab);
+		mean_y = mean_y/(count_inhab);
+		
+		console.log(count_cities, mean_x, mean_y);
 
 		var feature = g.selectAll("circle")
 			.data(cities_geom.features)
@@ -77,10 +96,7 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 	    id: 'mapbox.light',
 	    noWrap: true,
 	    accessToken: 'pk.eyJ1IjoibWN0aWFzIiwiYSI6ImNqc2V2ZDB4ajE2dTc0M282azR0eTVocW8ifQ.IQP4GS8uS3dB3J5i1PGKZA'
-	}).addTo(mymap);
-
-	
-	this.svglayer = L.svg({clickable:true}).addTo(mymap);	
+	}).addTo(mymap);	
 
 	//Adding a info box that displays info when you hover over
 	/*var info = L.control();
@@ -96,7 +112,7 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 
 	this.update(this.year);
 	//this.setFilter(this.filter);
-	mymap.on("moveend", this.update(this.year));
+	mymap.on("zoomend", this.update(this.year));
 
 	function mouseOver(feature, population){
 		 feature.on("mouseover", function(d){

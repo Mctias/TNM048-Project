@@ -1,6 +1,6 @@
 var map;
 d3.json("./sweden_counties.geojson", (sweden_counties)=>{
-	d3.json("./cities_geom.geojson", (cities_geom)=>{
+	d3.json("./cities_geom_4326.geojson", (cities_geom)=>{
 		d3.json("./cities_inhabitants.json", (cities_inhabitants)=>{
 			map = new map(sweden_counties, cities_geom, cities_inhabitants);
 			
