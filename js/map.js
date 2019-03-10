@@ -48,22 +48,22 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 			.style("stroke", "black")
 			.style("opacity", function(d){
 				let opacity = 0.2;
-				if (inhab[d.properties.city] == 0 || inhab_next[d.properties.city] == 0) {
+				if (parseInt(inhab[d.properties.city]) == 0 || parseInt(inhab_next[d.properties.city]) == 0) {
 					return 0.5;
 				}
-				let increase = Math.max(0.1, (inhab_next[d.properties.city] - inhab[d.properties.city])/inhab[d.properties.city]);
+				let increase = Math.max(0.1, (parseInt(inhab_next[d.properties.city]) - parseInt(inhab[d.properties.city]))/parseInt(inhab[d.properties.city]));
 				if (isNaN(increase)) {
 					return 0.5;
 				}
 				//console.log(opacity+increase);
-				return opacity+2*increase;
+				return 0.5;//opacity+2*increase;
 			})
 			.style("fill", function(d){
 				let color = "#555555";
-				if (inhab[d.properties.city] == 0 || inhab_next[d.properties.city] == 0) {
+				if (parseInt(inhab[d.properties.city]) == 0 || parseInt(inhab_next[d.properties.city]) == 0) {
 					return color;
 				}
-				let increase = (inhab_next[d.properties.city] - inhab[d.properties.city])/inhab[d.properties.city];
+				let increase = (parseInt(inhab_next[d.properties.city]) - parseInt(inhab[d.properties.city]))/parseInt(inhab[d.properties.city]);
 				if (isNaN(increase)) {
 					return color;
 				}
@@ -77,20 +77,20 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 			})
 			.attr("r", function(d){
 
-				let size = Math.floor(Math.pow(inhab[d.properties.city], 0.25));
+				let size = Math.floor(Math.pow(parseInt(inhab[d.properties.city]), 0.25));
 				//console.log(this.filter);
 				if (isNaN(size)) {
 					return 0;
 				}
-				if (inhab[d.properties.city] < 0) {
+				if (parseInt(inhab[d.properties.city]) < 0) {
 					return 0;
 				}
 
 				return size;
 			});
 			
-			mouseOver(feature, inhab);
-			mouseOut(feature, inhab, inhab_next);
+			mouseOver(feature, parseInt(inhab));
+			mouseOut(feature, parseInt(inhab), parseInt(inhab_next));
 		feature.attr("transform",
 		    	function(d) {
 		   			var layerPoint = mymap.latLngToLayerPoint(d.latLng);
