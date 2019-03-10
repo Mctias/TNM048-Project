@@ -13,6 +13,19 @@
     width: 100%;
 }
 
+#sizeslider {
+    position: relative;
+    top: 80%;
+    height: 20%;
+    width: 800px;
+}
+
+#value-size {
+    top: 0px;
+    height: 50%;
+    width: 100%;
+}
+
 .info {
     padding: 6px 8px;
     font: 14px/16px Arial, Helvetica, sans-serif;

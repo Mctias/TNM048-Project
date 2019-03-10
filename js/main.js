@@ -8,7 +8,7 @@ d3.json("./sweden_counties.geojson", (sweden_counties)=>{
 			let max_year = 2000;
 			let step = 20;
 			let steps = Math.floor((max_year-min_year)/step);
-			console.log(steps);
+			//console.log(steps);
 
 			var sliderTime = d3
 				.sliderBottom()
