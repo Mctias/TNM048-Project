@@ -2,21 +2,26 @@
 
 #timeslider {
     position: absolute;
-    top: 80%;
-    height: 20%;
+    top: 90%;
+    height: 10%;
     width: 800px;
 }
 
-#value-time {
-    top: 0px;
+#timebox {
+	position: absolute;
+	z-index: 999;
+    top: 40px;
     height: 50%;
     width: 100%;
+	left: 360px;
+	font-size: xx-large;
+	font-weight: bold;
 }
 
 #sizeslider {
     position: relative;
-    top: 80%;
-    height: 20%;
+    top: 90%;
+    height: 10%;
     width: 800px;
 }
 

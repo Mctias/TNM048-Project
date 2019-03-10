@@ -1,18 +1,20 @@
 function map(sweden_counties, cities_geom, cities_inhabitants){
 	this.year = 1570;
 	this.svglayer = null;
+	this.tilelayer = null;
 
 	this.update = function(year) {
 		this.year = year;
 		let inhab = cities_inhabitants[year];
 		let inhab_next = cities_inhabitants[year+10];
 
-		if (mymap.hasLayer(this.svglayer)){
-			mymap.removeLayer(this.svglayer);
-		}
-		this.svglayer = null;
+		mymap.eachLayer(function (layer) {
+			if(!layer.options.attribution){
+				mymap.removeLayer(layer);
+			}
+		});
 		
-		this.svglayer = L.svg({clickable:true}).addTo(mymap);	
+		this.svglayer = L.svg({clickable:true}).addTo(mymap);
 		
 		var svg = d3.select("#mapid").select("svg").attr("pointer-events", "auto");
 		var g = svg.append("g");
@@ -24,8 +26,8 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 		
 		// Add a LatLng object to each item in the dataset 
 		cities_geom.features.forEach(function(d) {
-			d.latLng = new L.LatLng(Math.round(d.geometry.coordinates[1]*100)/100,
-									Math.round(d.geometry.coordinates[0]*100)/100);
+			d.latLng = new L.LatLng(d.geometry.coordinates[1],
+									d.geometry.coordinates[0]);
 			
 			if (!isNaN(d.geometry.coordinates[0]*parseInt(inhab[d.properties.city])) && !isNaN(d.geometry.coordinates[1]*parseInt(inhab[d.properties.city]))){
 				count_cities++;
@@ -38,7 +40,6 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 		mean_x = mean_x/(count_inhab);
 		mean_y = mean_y/(count_inhab);
 		
-		console.log(count_cities, mean_x, mean_y);
 
 		var feature = g.selectAll("circle")
 			.data(cities_geom.features)
@@ -58,7 +59,21 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 				return opacity+2*increase;
 			})
 			.style("fill", function(d){
-				return "red";
+				let color = "#555555";
+				if (inhab[d.properties.city] == 0 || inhab_next[d.properties.city] == 0) {
+					return color;
+				}
+				let increase = (inhab_next[d.properties.city] - inhab[d.properties.city])/inhab[d.properties.city];
+				if (isNaN(increase)) {
+					return color;
+				}
+				if (increase>0){
+					color = "#" + String(Math.max(0,55-Math.round(increase*50))) + String(Math.min(99,55+Math.round(increase*50))) + "55";
+				} else {
+					increase *= -1;
+					color = "#" + String(Math.max(0,55+Math.round(increase*150))) + String(Math.min(99,55-Math.round(increase*150))) + "55";
+				}
+				return color;
 			})
 			.attr("r", function(d){
 
@@ -75,21 +90,28 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 			});
 			
 			mouseOver(feature, inhab);
-			mouseOut(feature);
+			mouseOut(feature, inhab, inhab_next);
 		feature.attr("transform",
 		    	function(d) {
 		   			var layerPoint = mymap.latLngToLayerPoint(d.latLng);
 		     		return "translate("+ layerPoint.x +","+ layerPoint.y +")";
 		        }
 		    )
+			
+		let circle = L.circle([mean_y, mean_x], {
+			color: 'black',
+			fillColor: 'blue',
+			fillOpacity: 0.5,
+		})
+		circle.setRadius(10*(36-2*mymap.getZoom())+(Math.pow(count_inhab,0.85)*0.01*(36-2*mymap.getZoom())));
+		circle.addTo(mymap);	
 	}
 	
 	var mymap = L.map('mapid').setView([62, 15], 5);
-
 	//var geojson;
 
 	//var geoJsonData = new L.GeoJSON.AJAX("../sweden_counties.geojson");  
-	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+	this.tilelayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
 	    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
 	    maxZoom: 18,
 	    minZoom: 5,
@@ -112,30 +134,55 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 
 	this.update(this.year);
 	//this.setFilter(this.filter);
-	mymap.on("zoomend", this.update(this.year));
+	mymap.on("moveend", function(){
+		setTimeout(function(){
+			map.update(map.year);
+		}, 1);
+	});
+	mymap.on("zoomend", function(){
+		setTimeout(function(){
+			map.update(map.year);
+		}, 1);
+	});
 
 	function mouseOver(feature, population){
 		 feature.on("mouseover", function(d){
 		 	d3.select(this) 
         	.transition()
         	.duration(500)
-        	.style("fill", "green");
+        	.style("fill", "blue");
         	tooltip(d, population);
         });
 
 		
 	}
-	function mouseOut(feature){
+	function mouseOut(feature, inhab, inhab_next){
 
         feature.on("mouseout", function () {
             d3.select(this)
                 .transition()
                 .duration(500)
-                .style("fill", "red");
-            });
+                .style("fill", function(d){
+					let color = "#555555";
+					if (inhab[d.properties.city] == 0 || inhab_next[d.properties.city] == 0) {
+						return color;
+					}
+					let increase = (inhab_next[d.properties.city] - inhab[d.properties.city])/inhab[d.properties.city];
+					if (isNaN(increase)) {
+						return color;
+					}
+					if (increase>0){
+						color = "#" + String(Math.max(0,55-Math.round(increase*50))) + String(Math.min(99,55+Math.round(increase*50))) + "55";
+					} else {
+						increase *= -1;
+						color = "#" + String(Math.max(0,55+Math.round(increase*150))) + String(Math.min(99,55-Math.round(increase*150))) + "55";
+					}
+					return color;
+				});
           
-    }
-
+		});
+	}
+	
     function tooltip(d, population){
     	var tooltip = d3.select("#tooltip")
         tooltip
