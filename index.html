@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <html>
   <head>
+
+     <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
   	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
     integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
     crossorigin=""/>
 
-     
 
     <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
    	integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
@@ -15,19 +24,37 @@
     <script type="text/javascript" src="libs/d3/d3.min.js"></script>
 
     <link rel="stylesheet" href="js/map.css" />
+    <link rel="stylesheet" href="css/index.css" />
+   
 
     <meta charset="UTF-8">
     <title>Map test</title>
   </head>
-  <body>
-    <div id="mapid"></div>
-    <div id="graphid"></div>
+  <body class="container-fluid">
+    <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-12 col-md-10 col-lg-10 col-xl-10">
+                        <div id="mapid"></div>
+                    </div>
+                    <div class="col-sm-12 col-md-2 col-lg-2 col-xl-2">
+                        <div class="row">
+                            <div class="col-12" id="tooltip">
+                                <br>
+                                <h5><strong>Information</strong></h5>
+                                <hr>
+                                <p><span id="name">Name</span></p>
+                                <p><span id="population">Population</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 	
 	<div id="timeslider" class="row align-items-center">
-      <div class="col-sm-2"><p id="value-time"></p></div>
-      <div class="col-sm"><div id="slider-time"></div></div>
-    </div>
-	
+    <div class="col-sm-2"><p id="value-time"></p></div>
+    <div class="col-sm"><div id="slider-time"></div></div>
+  </div>
+
   </body>
     <script src="js/main.js"></script>
    	<script src="js/map.js"></script>

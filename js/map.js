@@ -1,12 +1,12 @@
 function map(sweden_counties, cities_geom, cities_inhabitants){
 	this.year = 1570;
 	this.svglayer = null;
-	
+
 	this.update = function(year) {
 		this.year = year;
 		let inhab = cities_inhabitants[year];
 		let inhab_next = cities_inhabitants[year+10];
-		
+
 		mymap.removeLayer(this.svglayer);
 		this.svglayer = null;
 		
@@ -35,24 +35,28 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 				if (isNaN(increase)) {
 					return 0.5;
 				}
-				console.log(opacity+increase);
+				//console.log(opacity+increase);
 				return opacity+2*increase;
 			})
 			.style("fill", function(d){
 				return "red";
 			})
 			.attr("r", function(d){
+
 				let size = Math.floor(Math.pow(inhab[d.properties.city], 0.25));
+				//console.log(this.filter);
 				if (isNaN(size)) {
 					return 0;
 				}
+				if (inhab[d.properties.city] < 0) {
+					return 0;
+				}
+
 				return size;
 			});
 			
-			mouseOver(feature);
+			mouseOver(feature, inhab);
 			mouseOut(feature);
-		
-		
 		feature.attr("transform",
 		    	function(d) {
 		   			var layerPoint = mymap.latLngToLayerPoint(d.latLng);
@@ -94,17 +98,19 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 	info.addTo(mymap);*/
 
 	this.update(this.year);
+	//this.setFilter(this.filter);
 	mymap.on("moveend", this.update(this.year));
-		
-	
 
-	function mouseOver(feature){
-		 feature.on("mouseover", function(){
+	function mouseOver(feature, population){
+		 feature.on("mouseover", function(d){
 		 	d3.select(this) 
         	.transition()
         	.duration(500)
-        	.attr("r", 20);
+        	.style("fill", "green");
+        	tooltip(d, population);
         });
+
+		
 	}
 	function mouseOut(feature){
 
@@ -112,12 +118,20 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
             d3.select(this)
                 .transition()
                 .duration(500)
-                .attr("r", 6);
+                .style("fill", "red");
             });
           
     }
 
-	
+    function tooltip(d, population){
+    	var tooltip = d3.select("#tooltip")
+        tooltip
+            .select("#name")
+            .text("Name: " + d.properties.city);
+        tooltip
+            .select("#population")
+            .text("Population: " + population[d.properties.city]);
+    }
 	
 	/*//Styling of the layover
 	function style(){
