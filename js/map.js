@@ -7,6 +7,8 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 		this.year = year;
 		let inhab = cities_inhabitants[year];
 		let inhab_next = cities_inhabitants[year+10];
+		
+		console.log(inhab);
 
 		mymap.eachLayer(function (layer) {
 			if(!layer.options.attribution){
@@ -89,8 +91,8 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
 				return size;
 			});
 			
-			mouseOver(feature, parseInt(inhab));
-			mouseOut(feature, parseInt(inhab), parseInt(inhab_next));
+			mouseOver(feature, inhab);
+			mouseOut(feature, inhab, inhab_next);
 		feature.attr("transform",
 		    	function(d) {
 		   			var layerPoint = mymap.latLngToLayerPoint(d.latLng);
@@ -151,6 +153,7 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
         	.transition()
         	.duration(500)
         	.style("fill", "blue");
+			console.log(population);
         	tooltip(d, population);
         });
 
@@ -162,12 +165,13 @@ function map(sweden_counties, cities_geom, cities_inhabitants){
             d3.select(this)
                 .transition()
                 .duration(500)
+				.style("opacity", 0.5)
                 .style("fill", function(d){
 					let color = "#555555";
-					if (inhab[d.properties.city] == 0 || inhab_next[d.properties.city] == 0) {
+					if (parseInt(inhab[d.properties.city]) == 0 || parseInt(inhab_next[d.properties.city]) == 0) {
 						return color;
 					}
-					let increase = (inhab_next[d.properties.city] - inhab[d.properties.city])/inhab[d.properties.city];
+					let increase = (parseInt(inhab_next[d.properties.city]) - parseInt(inhab[d.properties.city]))/parseInt(inhab[d.properties.city]);
 					if (isNaN(increase)) {
 						return color;
 					}
