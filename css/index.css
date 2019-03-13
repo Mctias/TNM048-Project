@@ -1,6 +1,62 @@
 .no-mouse {
     pointer-events: none;
 }
+
+#mapid {
+	height: 800px;
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#timeslider {
+    position: absolute;
+    top: 90%;
+    height: 10%;
+    width: 800px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#timebox {
+	position: absolute;
+	z-index: 999;
+    top: 40px;
+}
+
+#value-time{
+	position: absolute;
+	left: 100px;
+	font-size: xx-large;
+	font-weight: bold;
+}
+
+#sizeslider {
+    position: relative;
+    top: 90%;
+    height: 10%;
+    width: 800px;
+}
+
+#value-size {
+    top: 0px;
+    height: 50%;
+    width: 100%;
+}
+
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
+
 #tooltip{
         height: 270px;
         background-color: white;
