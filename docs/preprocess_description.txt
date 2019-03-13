@@ -1,0 +1,26 @@
+Dataset 1 (1960-2000)
+Data format example: Norrköpings kommun: {1980: 111111, 2010: 222222}
+Processing:
+1. Extract name without "kommun".
+2. Filter to keep only cities with population > 5000 at any year (to avoid cluttered map)
+3. Rearrange to data format: 1980: {Norrköping: 111111, Linköping: 222222
+
+Dataset 2 (1580-1960)
+Data format example: Norrköping: {1590: 1111, 1680: 2222}
+Processing:
+1. Filter away cities with population missing or null (not 0).
+2. Filter away cities with population decrease from >1000 to 0 in two adjacent measure points.
+
+Dataset 3 (geometries)
+Data format example: Norrköping: {lat: 123456, lon: 123456}, coordinates in sweref99 system
+Processing:
+1. Transform coordinates to wgs84 (lat/long).
+
+Merge:
+1. Merge dataset 1 and 2.
+2. Filter out data points with names that only exists in one of the two datasets.
+3. Filter out points which not matches a data point i dataset 3 (geometries).
+4. Interpolate (linear) population between known years to get data for each year.
+
+
+

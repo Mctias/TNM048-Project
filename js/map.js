@@ -3,14 +3,14 @@ function map(start_year, cities_geom, cities_inhabitants){
 	// ---------- Declare functions ----------
 	
 	// Function to update map
-	this.update = function(year) {
+	this.update = function(new_year) {
 		
-		this.year = start_year;
-		if (year) {
-			this.year = year;
+		if (new_year) {
+			year = new_year;
 		}
-		var inhab = cities_inhabitants[this.year];
-		var inhab_next = cities_inhabitants[this.year+10];
+		
+		var inhab = cities_inhabitants[year];
+		var inhab_next = cities_inhabitants[year+10];
 		
 		// Set fill color of cities
 		function setFillColor(d){
@@ -173,14 +173,15 @@ function map(start_year, cities_geom, cities_inhabitants){
 	mymap.on("moveend", function(){
 		setTimeout(function(){
 			map.update();
-		}, 1);
+		}, 0);
 	});
 	mymap.on("zoomend", function(){
 		setTimeout(function(){
 			map.update();
-		}, 1);
+		}, 0);
 	});
 	
 	// Initial map update
+	var year = start_year;
 	this.update();
 }
